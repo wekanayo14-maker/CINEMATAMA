@@ -1,0 +1,224 @@
+/* ==========================================================================
+   CINEMATAMA — Global Stylesheet
+   Seluruh styling kustom (di luar utilitas Tailwind) berada di file ini.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Design Token
+   -------------------------------------------------------------------------- */
+:root {
+    /* Palet warna aplikasi. Dipakai di bawah lewat var(--nama-variabel). */
+    --color-bg: #08090d;
+    --color-card: #12141b;
+    --color-secondary: #1b1e28;
+    --color-maroon: #b91c3b;
+    --color-maroon-hover: #9f1832;
+    --color-text: #f8fafc;
+    --color-text-muted: #9ca3af;
+    --color-gold: #fbbf24;
+
+    /* Font dasar seluruh halaman dan kurva animasi yang dipakai berulang. */
+    --font-sans: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif;
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --------------------------------------------------------------------------
+   2. Base
+   -------------------------------------------------------------------------- */
+/* Gulir halaman menjadi halus saat berpindah bagian. */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Dasar halaman: latar gelap, font, dan cegah scroll horizontal. */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Hindari kotak latar pada gambar transparan (mis. logo PNG). */
+img {
+    background-color: transparent;
+}
+
+/* --------------------------------------------------------------------------
+   3. Scrollbar
+   -------------------------------------------------------------------------- */
+/* Scrollbar tipis agar sesuai tema gelap (Chrome/Edge/Safari). */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-secondary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-maroon);
+}
+
+/* Sembunyikan scrollbar pada carousel horizontal */
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* --------------------------------------------------------------------------
+   4. Navbar Floating
+   -------------------------------------------------------------------------- */
+.navbar {
+    background-color: rgba(8, 9, 13, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    transition: background-color 0.3s ease, border-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+.navbar.is-scrolled {
+    background-color: rgba(18, 20, 27, 0.95);
+    border-color: rgba(27, 30, 40, 0.8);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8);
+}
+
+/* --------------------------------------------------------------------------
+   5. Navigasi
+   -------------------------------------------------------------------------- */
+.nav-link {
+    color: var(--color-text-muted);
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+    color: var(--color-maroon);
+}
+
+.nav-link.is-active {
+    color: var(--color-text);
+}
+
+/* --------------------------------------------------------------------------
+   6. Komponen
+   -------------------------------------------------------------------------- */
+
+/* Slide hero */
+.hero-slide {
+    transition: opacity 0.8s var(--ease-smooth);
+}
+
+/* Kartu film */
+.card-hover-effect {
+    transition: transform 0.3s var(--ease-smooth), box-shadow 0.3s var(--ease-smooth);
+}
+
+.card-hover-effect:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 24px -10px rgba(185, 28, 59, 0.3);
+}
+
+/* Tombol simpan (bookmark) pada kartu */
+.bookmark-btn {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: var(--color-text-muted);
+}
+
+.bookmark-btn:hover {
+    color: #ffffff;
+}
+
+.bookmark-btn.is-saved {
+    background-color: var(--color-maroon);
+    color: #ffffff;
+}
+
+.bookmark-btn.is-saved svg {
+    fill: currentColor;
+}
+
+/* Notifikasi toast */
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--color-card);
+    border: 1px solid var(--color-maroon);
+    border-radius: 0.75rem;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+    pointer-events: auto;
+    opacity: 0;
+    transform: translateY(1rem);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast.is-hiding {
+    opacity: 0;
+    transform: translateY(1rem);
+}
+
+/* --------------------------------------------------------------------------
+   7. Lebar kartu pada scroll horizontal
+   -------------------------------------------------------------------------- */
+/* Lebar tetap tiap kartu di dalam carousel geser horizontal. */
+.card-fixed-width {
+    width: 140px;
+    flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+    .card-fixed-width {
+        width: 168px;
+    }
+}
+
+/* Tablet: kartu sedikit lebih besar agar tidak terlalu rapat. */
+@media (min-width: 768px) {
+    .card-fixed-width {
+        width: 176px;
+    }
+}
+
+/* Laptop ke atas: ukuran kartu final. */
+@media (min-width: 1024px) {
+    .card-fixed-width {
+        width: 188px;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   8. Aksesibilitas: hormati preferensi pengurangan gerakan
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    .card-hover-effect:hover {
+        transform: none;
+    }
+}

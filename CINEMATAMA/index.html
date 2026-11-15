@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <!--
+      Halaman ini hanya berisi struktur/tampilan.
+      Gaya tampilan : css/style.css
+      Logika        : js/script.js
+      Semua tombol memakai atribut data-action (bukan onclick), lalu
+      ditangani oleh onDocumentClick() di js/script.js.
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#08090D">
+    <meta name="description" content="CINEMATAMA - Platform eksplorasi film dan serial TV dengan antarmuka sinematik modern.">
+    <title>CINEMATAMA - Film Gacor Weka</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Tailwind CSS CDN (tema diatur di bagian atas js/script.js) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Icons & aplikasi -->
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="script.js" defer></script>
+
+</head>
+<body class="bg-[#08090D] text-[#F8FAFC] antialiased min-h-screen flex flex-col justify-between selection:bg-[#B91C3B] selection:text-white">
+
+    <!-- ========================================== -->
+    <!-- 1. MAIN APP CONTAINER -->
+    <!-- ========================================== -->
+    <div id="app-wrapper" class="min-h-screen flex flex-col justify-between">
+
+        <!-- HEADER NAVBAR (FLOATING & ROUNDED) -->
+        <!-- Menggunakan fixed, top-4, left-1/2, -translate-x-1/2 untuk efek mengambang di tengah -->
+        <header id="main-navbar" class="navbar fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-50 rounded-full px-4 sm:px-6 py-2 shadow-lg">
+            <div class="flex items-center justify-between gap-4">
+                
+                <div class="flex items-center gap-6">
+                    <a href="#home" class="flex items-center gap-2 hover:opacity-90 transition" aria-label="Beranda Cinematama">
+                        <img src="image/d034d526-1084-48ba-9bc4-721c27cccf94.png" alt="Cinematama Logo" data-img-error="logo" class="h-10 sm:h-12 w-auto object-contain">
+                        <span class="hidden text-xl sm:text-2xl font-black tracking-wider text-white">CINEMATAMA</span>
+                    </a>
+
+                    <nav class="hidden md:flex items-center gap-6 text-sm font-semibold" aria-label="Navigasi utama">
+                        <a href="#home" class="nav-link is-active py-1" data-route="home">Beranda</a>
+                        <a href="#movies" class="nav-link py-1" data-route="movies">Film</a>
+                        <a href="#series" class="nav-link py-1" data-route="series">Serial TV</a>
+                        <a href="#my-list" class="nav-link py-1 flex items-center gap-1.5" data-route="my-list">
+                            <i data-lucide="bookmark" class="w-4 h-4"></i> Daftar Saya
+                        </a>
+                    </nav>
+                </div>
+
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <a href="#search" class="p-2 rounded-full hover:bg-white/10 text-[#9CA3AF] hover:text-white transition" title="Cari Film" aria-label="Cari film">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </a>
+
+                    <button type="button" id="mobile-menu-btn" data-action="toggle-mobile-menu" aria-expanded="false" aria-label="Buka menu navigasi"
+                        class="md:hidden p-2 text-[#9CA3AF] hover:text-white focus:outline-none">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Drawer Menu (Muncul di bawah navbar floating) -->
+            <div id="mobile-menu" class="hidden md:hidden bg-[#12141B] border border-[#1B1E28] rounded-2xl mt-2 px-4 pt-2 pb-6 space-y-3 absolute left-0 right-0 top-full shadow-2xl">
+                <a href="#home" data-action="close-mobile-menu" class="block py-2 text-sm font-semibold text-white hover:text-[#B91C3B]">Beranda</a>
+                <a href="#movies" data-action="close-mobile-menu" class="block py-2 text-sm font-semibold text-[#9CA3AF] hover:text-[#B91C3B]">Film</a>
+                <a href="#series" data-action="close-mobile-menu" class="block py-2 text-sm font-semibold text-[#9CA3AF] hover:text-[#B91C3B]">Serial TV</a>
+                <a href="#my-list" data-action="close-mobile-menu" class="block py-2 text-sm font-semibold text-[#9CA3AF] hover:text-[#B91C3B] flex items-center gap-2">
+                    <i data-lucide="bookmark" class="w-4 h-4 text-[#B91C3B]"></i> Daftar Saya
+                </a>
+            </div>
+        </header>
+
+        <!-- MAIN VIRTUAL VIEW CONTAINER -->
+        <!-- Padding-top disesuaikan agar tidak tertutup navbar floating (pt-24 sm:pt-28) -->
+        <main class="flex-grow pt-24 sm:pt-28">
+
+            <!-- ================= PAGE: HOME ================= -->
+            <section id="page-home" class="virtual-page space-y-10 pb-16">
+                <!-- Carousel hero: slide & indikator diisi otomatis oleh setupHeroCarousel() -->
+                <div id="hero-carousel" class="relative w-full h-[70vh] sm:h-[78vh] lg:h-[82vh] min-h-[420px] max-h-[780px] bg-[#08090D] overflow-hidden group">
+                    <div id="hero-slides-container" class="relative w-full h-full"></div>
+
+                    <button type="button" data-action="hero-prev" aria-label="Slide sebelumnya"
+                        class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#12141B]/60 hover:bg-[#B91C3B] backdrop-blur-md text-white flex items-center justify-center transition border border-[#1B1E28] opacity-100 md:opacity-0 md:group-hover:opacity-100">
+                        <i data-lucide="chevron-left" class="w-6 h-6"></i>
+                    </button>
+                    <button type="button" data-action="hero-next" aria-label="Slide berikutnya"
+                        class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#12141B]/60 hover:bg-[#B91C3B] backdrop-blur-md text-white flex items-center justify-center transition border border-[#1B1E28] opacity-100 md:opacity-0 md:group-hover:opacity-100">
+                        <i data-lucide="chevron-right" class="w-6 h-6"></i>
+                    </button>
+
+                    <!-- Titik penanda slide (disisipkan oleh JS) -->
+                    <div id="hero-indicators" class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2"></div>
+                </div>
+
+                <!-- Section: Continue Watching -->
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex items-center justify-between gap-2 mb-4">
+                        <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                            <i data-lucide="play-circle" class="w-6 h-6 text-[#B91C3B]"></i>
+                            Lanjutkan Menonton
+                        </h2>
+                    </div>
+                    <!-- Diisi renderContinueWatchingSection() dari riwayat tontonan -->
+                    <div id="continue-watching-container"></div>
+                </div>
+
+                <!-- Section: Trending Now -->
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex items-center justify-between gap-2 mb-4">
+                        <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                            <i data-lucide="trending-up" class="w-6 h-6 text-[#B91C3B]"></i>
+                            Trending Sekarang
+                        </h2>
+                        <div class="flex items-center gap-2">
+                            <button type="button" data-action="scroll-section" data-target="trending-list" data-direction="left" aria-label="Geser ke kiri"
+                                class="p-2 rounded-full bg-[#12141B] border border-[#1B1E28] hover:bg-[#B91C3B] transition text-white">
+                                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                            </button>
+                            <button type="button" data-action="scroll-section" data-target="trending-list" data-direction="right" aria-label="Geser ke kanan"
+                                class="p-2 rounded-full bg-[#12141B] border border-[#1B1E28] hover:bg-[#B91C3B] transition text-white">
+                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Carousel geser; kartunya dibuat renderMovieCards() -->
+                    <div id="trending-list" class="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar scroll-smooth pb-4"></div>
+                </div>
+
+                <!-- Section: Indonesian Short Films -->
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                                <i data-lucide="clapperboard" class="w-6 h-6 text-[#B91C3B]"></i>
+                                Film Pendek Indonesia Pilihan
+                            </h2>
+                            <p class="text-xs text-[#9CA3AF] mt-0.5">Karya terbaik sineas tanah air lengkap dengan sinopsis dan deretan pemeran utama.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" data-action="scroll-section" data-target="indonesia-list" data-direction="left" aria-label="Geser ke kiri"
+                                class="p-2 rounded-full bg-[#12141B] border border-[#1B1E28] hover:bg-[#B91C3B] transition text-white">
+                                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                            </button>
+                            <button type="button" data-action="scroll-section" data-target="indonesia-list" data-direction="right" aria-label="Geser ke kanan"
+                                class="p-2 rounded-full bg-[#12141B] border border-[#1B1E28] hover:bg-[#B91C3B] transition text-white">
+                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Carousel geser; kartunya dibuat renderMovieCards() -->
+                    <div id="indonesia-list" class="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar scroll-smooth pb-4"></div>
+                </div>
+
+                <!-- Section: Cinematama Originals -->
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex items-center justify-between gap-2 mb-4">
+                        <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                            <i data-lucide="sparkles" class="w-6 h-6 text-[#B91C3B]"></i>
+                            Cinematama Originals
+                        </h2>
+                    </div>
+                    <!-- Grid; kartunya dibuat renderMovieGrid() -->
+                    <div id="originals-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3"></div>
+                </div>
+
+                <!-- Section: Popular Movies -->
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex items-center justify-between gap-2 mb-4">
+                        <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                            <i data-lucide="flame" class="w-6 h-6 text-[#B91C3B]"></i>
+                            Film Populer
+                        </h2>
+                        <a href="#movies" class="text-xs text-[#9CA3AF] hover:text-[#B91C3B] font-semibold transition">Lihat Semua -&gt;</a>
+                    </div>
+                    <!-- Carousel geser; kartunya dibuat renderMovieCards() -->
+                    <div id="popular-list" class="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar scroll-smooth pb-4"></div>
+                </div>
+            </section>
+
+
+            <!-- ================= PAGE: MOVIES CATALOG ================= -->
+            <section id="page-movies" class="virtual-page hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#1B1E28] pb-6">
+                    <div>
+                        <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Katalog Film Pendek</h1>
+                        <p class="text-xs sm:text-sm text-[#9CA3AF] mt-1">Koleksi film pendek terbaik yang bisa langsung ditonton dari YouTube.</p>
+                    </div>
+                    <div class="text-xs text-[#9CA3AF]">
+                        Menampilkan <span id="movies-count-badge" class="text-white font-bold">0</span> judul
+                    </div>
+                </div>
+
+                <div class="bg-[#12141B] border border-[#1B1E28] rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="relative">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]"></i>
+                        <label for="catalog-search" class="sr-only">Cari judul film</label>
+                        <!-- Filter katalog: setiap perubahan memicu applyCatalogFilters() -->
+                        <input type="text" id="catalog-search" placeholder="Cari judul..."
+                            class="w-full bg-[#08090D] border border-[#1B1E28] rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-gray-500 focus:border-[#B91C3B] outline-none">
+                    </div>
+
+                    <div>
+                        <label for="catalog-genre" class="sr-only">Filter genre</label>
+                        <!-- Filter berdasarkan genre film -->
+                        <select id="catalog-genre" class="w-full bg-[#08090D] border border-[#1B1E28] rounded-xl px-3 py-2 text-xs text-white focus:border-[#B91C3B] outline-none">
+                            <option value="ALL">Semua Genre</option>
+                            <option value="Indonesian">Film Pendek Indonesia</option>
+                            <option value="Animation">Animation</option>
+                            <option value="Action">Action</option>
+                            <option value="Adventure">Adventure</option>
+                            <option value="Comedy">Comedy</option>
+                            <option value="Drama">Drama</option>
+                            <option value="Fantasy">Fantasy</option>
+                            <option value="Horror">Horror</option>
+                            <option value="Sci-Fi">Sci-Fi</option>
+                            <option value="Thriller">Thriller</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="catalog-year" class="sr-only">Filter tahun</label>
+                        <!-- Filter berdasarkan rentang tahun rilis -->
+                        <select id="catalog-year" class="w-full bg-[#08090D] border border-[#1B1E28] rounded-xl px-3 py-2 text-xs text-white focus:border-[#B91C3B] outline-none">
+                            <option value="ALL">Semua Tahun</option>
+                            <option value="2020-2026">2020 - 2026</option>
+                            <option value="2015-2019">2015 - 2019</option>
+                            <option value="2010-2014">2010 - 2014</option>
+                            <option value="CLASSIC">Di Bawah 2010</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="catalog-sort" class="sr-only">Urutkan</label>
+                        <!-- Pengurutan hasil katalog -->
+                        <select id="catalog-sort" class="w-full bg-[#08090D] border border-[#1B1E28] rounded-xl px-3 py-2 text-xs text-white focus:border-[#B91C3B] outline-none">
+                            <option value="popular">Terpopuler</option>
+                            <option value="rating">Rating Tertinggi</option>
+                            <option value="newest">Terbaru</option>
+                            <option value="title">Judul (A-Z)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Grid hasil filter film -->
+                <div id="movies-catalog-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3"></div>
+            </section>
+
+
+            <!-- ================= PAGE: SERIES CATALOG ================= -->
+            <section id="page-series" class="virtual-page hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+                <div class="border-b border-[#1B1E28] pb-6">
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Serial TV & Drama</h1>
+                    <p class="text-xs sm:text-sm text-[#9CA3AF] mt-1">Serial pilihan terbaik dengan episode lengkap kualitas tinggi.</p>
+                </div>
+
+                <!-- Grid serial; diisi renderSeriesPage() -->
+                <div id="series-catalog-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3"></div>
+            </section>
+
+
+            <!-- ================= PAGE: MOVIE DETAIL ================= -->
+            <section id="page-detail" class="virtual-page hidden pb-16">
+                <div class="relative w-full h-[50vh] sm:h-[60vh] bg-[#08090D] overflow-hidden">
+                    <!-- Semua teks & gambar di bawah ini diisi renderDetailPage(id) -->
+                    <img id="detail-backdrop" alt="Backdrop film" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#08090D] via-[#08090D]/70 to-transparent"></div>
+                    
+                    <!-- Tombol kembali ke halaman utama web -->
+                    <button type="button" data-action="go-home" aria-label="Kembali ke halaman utama" title="Kembali ke halaman utama"
+                        class="absolute top-6 left-6 z-20 flex items-center gap-2 px-4 py-2 rounded-full bg-[#12141B]/80 hover:bg-[#B91C3B] backdrop-blur-md text-white text-xs font-semibold border border-[#1B1E28] transition">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali
+                    </button>
+                </div>
+
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-32 relative z-20">
+                    <div class="flex flex-col md:flex-row gap-8 items-start">
+                        <!-- Poster detail: klik untuk langsung memutar film -->
+                        <a id="detail-poster-link" href="#" aria-label="Putar film"
+                            class="group w-48 sm:w-64 shrink-0 rounded-2xl overflow-hidden border border-[#1B1E28] bg-[#12141B] shadow-2xl mx-auto md:mx-0 relative block">
+                            <img id="detail-poster" alt="Thumbnail film" class="w-full aspect-video object-cover group-hover:opacity-60 transition">
+                            <span class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                <span class="w-12 h-12 rounded-full bg-[#B91C3B] text-white flex items-center justify-center shadow-lg">
+                                    <i data-lucide="play" class="w-6 h-6 fill-white"></i>
+                                </span>
+                            </span>
+                        </a>
+
+                        <div class="flex-grow space-y-4 text-center md:text-left">
+                            <div class="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                                <span id="detail-type-badge" class="bg-[#B91C3B] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">FILM</span>
+                                <span id="detail-year" class="text-xs font-semibold text-[#9CA3AF] bg-[#1B1E28] px-2.5 py-0.5 rounded-full">2024</span>
+                                <span class="flex items-center gap-1 text-xs font-bold text-amber-400 bg-amber-400/10 px-2.5 py-0.5 rounded-full border border-amber-400/20">
+                                    <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400"></i>
+                                    <span id="detail-rating">8.8</span>
+                                </span>
+                                <span id="detail-duration" class="text-xs text-[#9CA3AF]">2j 49m</span>
+                            </div>
+
+                            <h1 id="detail-title" class="text-3xl sm:text-5xl font-black text-white tracking-tight">Judul Film</h1>
+                            
+                            <div id="detail-genres" class="flex flex-wrap justify-center md:justify-start gap-2"></div>
+
+                            <p id="detail-overview" class="text-sm text-[#9CA3AF] leading-relaxed max-w-3xl">Sinopsis film...</p>
+
+                            <div class="pt-2 text-xs text-[#9CA3AF] space-y-1">
+                                <p><span class="text-white font-semibold">Sutradara:</span> <span id="detail-director">-</span></p>
+                                <p><span class="text-white font-semibold">Pemeran:</span> <span id="detail-cast">-</span></p>
+                            </div>
+
+                            <div class="pt-4 flex flex-wrap items-center justify-center md:justify-start gap-3">
+                                <button type="button" id="detail-play-btn" data-action="watch"
+                                    class="px-6 py-3 bg-[#B91C3B] hover:bg-[#9F1832] text-white font-bold rounded-xl transition shadow-lg shadow-[#B91C3B]/30 flex items-center gap-2 text-sm">
+                                    <i data-lucide="play" class="w-4 h-4 fill-white"></i> Tonton Sekarang
+                                </button>
+
+                                <a id="detail-youtube-btn" href="#" target="_blank" rel="noopener"
+                                    class="px-5 py-3 bg-[#1B1E28] hover:bg-[#12141B] text-white font-semibold rounded-xl border border-[#1B1E28] transition flex items-center gap-2 text-sm">
+                                    <i data-lucide="youtube" class="w-4 h-4 text-[#B91C3B]"></i> Buka di YouTube
+                                </a>
+
+                                <button type="button" id="detail-mylist-btn" data-action="toggle-mylist"
+                                    class="px-5 py-3 bg-[#12141B] hover:bg-[#1B1E28] text-[#9CA3AF] hover:text-white font-semibold rounded-xl border border-[#1B1E28] transition flex items-center gap-2 text-sm">
+                                    <i data-lucide="bookmark" class="w-4 h-4"></i> Tambah ke Daftar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-16 border-t border-[#1B1E28] pt-8">
+                        <h2 class="text-xl font-bold text-white mb-6">Rekomendasi Serupa</h2>
+                        <!-- Rekomendasi: judul lain dengan genre yang sama -->
+                        <div id="detail-similar-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3"></div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ================= PAGE: MY LIST ================= -->
+            <section id="page-my-list" class="virtual-page hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+                <div class="border-b border-[#1B1E28] pb-6 flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
+                            <i data-lucide="bookmark" class="w-7 h-7 text-[#B91C3B]"></i>
+                            Daftar Tontonan Saya
+                        </h1>
+                        <p class="text-xs sm:text-sm text-[#9CA3AF] mt-1">Film dan serial yang Anda simpan untuk ditonton nanti.</p>
+                    </div>
+                    <span id="mylist-count-badge" class="bg-[#12141B] border border-[#1B1E28] text-xs font-bold text-[#B91C3B] px-3 py-1 rounded-full">
+                        0 Item
+                    </span>
+                </div>
+
+                <!-- Daftar tersimpan; diisi renderMyListPage() dari localStorage -->
+                <div id="mylist-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3"></div>
+            </section>
+
+
+            <!-- ================= PAGE: SEARCH ================= -->
+            <section id="page-search" class="virtual-page hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+                <div class="max-w-2xl mx-auto text-center space-y-4">
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Pencarian Sinematik</h1>
+                    <div class="relative">
+                        <i data-lucide="search" class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-[#9CA3AF]"></i>
+                        <label for="global-search-input" class="sr-only">Cari film atau serial</label>
+                        <!-- Ketikan di sini memicu handleSearchQuery() (dengan debounce) -->
+                        <input type="search" id="global-search-input" placeholder="Cari judul film, sutradara, atau genre..."
+                            class="w-full bg-[#12141B] border border-[#1B1E28] focus:border-[#B91C3B] rounded-2xl pl-12 pr-4 py-3 text-sm text-white placeholder-gray-500 outline-none shadow-xl transition">
+                    </div>
+                    <div class="flex flex-wrap items-center justify-center gap-2 pt-2 text-xs">
+                        <span class="text-[#9CA3AF]">Pencarian Populer:</span>
+                        <button type="button" data-action="search" data-query="Tilik"
+                            class="px-2.5 py-1 rounded-full bg-[#12141B] hover:bg-[#B91C3B] text-[#9CA3AF] hover:text-white border border-[#1B1E28] transition">Tilik</button>
+                        <button type="button" data-action="search" data-query="Lemantun"
+                            class="px-2.5 py-1 rounded-full bg-[#12141B] hover:bg-[#B91C3B] text-[#9CA3AF] hover:text-white border border-[#1B1E28] transition">Lemantun</button>
+                        <button type="button" data-action="search" data-query="Indonesia"
+                            class="px-2.5 py-1 rounded-full bg-[#12141B] hover:bg-[#B91C3B] text-[#9CA3AF] hover:text-white border border-[#1B1E28] transition">Film Indonesia</button>
+                        <button type="button" data-action="search" data-query="Bu Tejo"
+                            class="px-2.5 py-1 rounded-full bg-[#12141B] hover:bg-[#B91C3B] text-[#9CA3AF] hover:text-white border border-[#1B1E28] transition">Bu Tejo</button>
+                        <button type="button" data-action="search" data-query="Sintel"
+                            class="px-2.5 py-1 rounded-full bg-[#12141B] hover:bg-[#B91C3B] text-[#9CA3AF] hover:text-white border border-[#1B1E28] transition">Sintel</button>
+                        <button type="button" data-action="search" data-query="Sci-Fi"
+                            class="px-2.5 py-1 rounded-full bg-[#12141B] hover:bg-[#B91C3B] text-[#9CA3AF] hover:text-white border border-[#1B1E28] transition">Sci-Fi</button>
+                        <button type="button" data-action="search" data-query="Animation"
+                            class="px-2.5 py-1 rounded-full bg-[#12141B] hover:bg-[#B91C3B] text-[#9CA3AF] hover:text-white border border-[#1B1E28] transition">Animation</button>
+                    </div>
+                </div>
+
+                <!-- Tempat hasil pencarian ditampilkan -->
+                <div id="search-results-container"></div>
+            </section>
+
+
+            <!-- ================= PAGE: WATCH VIDEO PLAYER ================= -->
+            <section id="page-watch" class="virtual-page hidden bg-[#08090D] min-h-[calc(100vh-80px)] py-6">
+                <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+                    <div class="flex items-center gap-2">
+                        <a id="watch-back-link" href="#home" class="inline-flex items-center gap-2 text-xs font-semibold text-[#9CA3AF] hover:text-white transition">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Detail Film
+                        </a>
+                    </div>
+
+                    <div class="relative w-full aspect-video bg-black rounded-3xl overflow-hidden border border-[#1B1E28] shadow-2xl">
+                        <!-- Video asli YouTube; alamatnya diisi renderWatchPage() di js/script.js -->
+                        <iframe id="youtube-player" class="absolute inset-0 w-full h-full" src="about:blank" title="Pemutar video"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen></iframe>
+                    </div>
+
+                    <div class="bg-[#12141B] border border-[#1B1E28] rounded-2xl p-6 space-y-2">
+                        <h1 id="watch-movie-title" class="text-2xl font-bold text-white">Judul Film</h1>
+                        <p id="watch-movie-overview" class="text-xs text-[#9CA3AF] leading-relaxed">Deskripsi film...</p>
+                        <div class="pt-3 text-xs text-[#9CA3AF] space-y-1 border-t border-[#1B1E28]">
+                            <p><span class="text-white font-semibold">Sutradara:</span> <span id="watch-movie-director">-</span></p>
+                            <p><span class="text-white font-semibold">Pemeran Utama:</span> <span id="watch-movie-cast">-</span></p>
+                        </div>
+                        <a id="watch-youtube-link" href="#" target="_blank" rel="noopener"
+                            class="inline-flex items-center gap-2 pt-2 text-[11px] font-semibold text-[#B91C3B] hover:text-white transition">
+                            <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Tonton langsung di YouTube
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+
+        <!-- FOOTER -->
+        <!-- Footer: tautan navigasi cepat & informasi proyek -->
+        <footer class="bg-[#12141B] border-t border-[#1B1E28] py-10 mt-16 text-xs text-[#9CA3AF]">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                <div class="space-y-3">
+                    <a href="#home" class="flex items-center gap-2" aria-label="Cinematama">
+                        <img src="image/d034d526-1084-48ba-9bc4-721c27cccf94.png" alt="Cinematama Logo" data-img-error="logo" class="h-16 w-auto object-contain">
+                        <span class="hidden text-2xl font-extrabold text-white">CINEMATAMA</span>
+                    </a>
+                    <p class="leading-relaxed">Platform eksplorasi sinematik interaktif dengan antarmuka modern dan tajam.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white mb-3 uppercase tracking-wider text-[11px]">Navigasi Utama</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="hover:text-white transition">Beranda</a></li>
+                        <li><a href="#movies" class="hover:text-white transition">Katalog Film</a></li>
+                        <li><a href="#series" class="hover:text-white transition">Serial TV</a></li>
+                        <li><a href="#my-list" class="hover:text-white transition">Daftar Saya</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white mb-3 uppercase tracking-wider text-[11px]">Kategori Populer</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#search" data-action="search" data-query="Indonesian" class="hover:text-white transition">Film Pendek Indonesia</a></li>
+                        <li><a href="#search" data-action="search" data-query="Sci-Fi" class="hover:text-white transition">Sci-Fi &amp; Ekspedisi</a></li>
+                        <li><a href="#search" data-action="search" data-query="Action" class="hover:text-white transition">Aksi Laga</a></li>
+                        <li><a href="#search" data-action="search" data-query="Drama" class="hover:text-white transition">Drama Sinematik</a></li>
+                        <li><a href="#search" data-action="search" data-query="Animation" class="hover:text-white transition">Animasi Pendek</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white mb-3 uppercase tracking-wider text-[11px]">Weka Nayottama Zayyan</h3>
+                    <p class="leading-relaxed">Website untuk Tugas Dan Karya Multimedia.</p>
+                </div>
+            </div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 border-t border-[#1B1E28] flex items-center justify-center text-center">
+                <p>&copy; 2026 CINEMATAMA</p>
+            </div>
+        </footer>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- MODALS & TOAST NOTIFICATIONS -->
+    <!-- ========================================== -->
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" data-modal-backdrop class="fixed inset-0 z-[110] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="relative w-full max-w-md bg-[#12141B] border border-[#1B1E28] rounded-3xl p-6 space-y-6 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-[#1B1E28] pb-4">
+                <h3 class="font-bold text-white text-base flex items-center gap-2">
+                    <i data-lucide="settings" class="w-5 h-5 text-[#B91C3B]"></i> Pengaturan Pemutaran
+                </h3>
+                <button type="button" data-action="close-settings" aria-label="Tutup pengaturan" class="text-[#9CA3AF] hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 text-xs">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <p class="font-bold text-white">Kualitas Pemutaran Default</p>
+                        <p class="text-[#9CA3AF]">Pilih resolusi otomatis untuk video streaming.</p>
+                    </div>
+                    <select class="shrink-0 bg-[#08090D] border border-[#1B1E28] text-white rounded-lg px-2.5 py-1.5 outline-none">
+                        <option>Auto (4K Ultra HD)</option>
+                        <option>1080p Full HD</option>
+                        <option>720p HD</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center justify-between gap-3 pt-2">
+                    <div>
+                        <p class="font-bold text-white">Autoplay Episode Berikutnya</p>
+                        <p class="text-[#9CA3AF]">Putar otomatis saat tayangan berakhir.</p>
+                    </div>
+                    <input type="checkbox" checked class="w-4 h-4 accent-[#B91C3B]">
+                </div>
+            </div>
+
+            <button type="button" data-action="save-settings"
+                class="w-full py-2.5 bg-[#B91C3B] hover:bg-[#9F1832] text-white font-bold rounded-xl text-xs transition">
+                Simpan Perubahan
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[120] space-y-2 pointer-events-none"></div>
+</body>
+</html>
